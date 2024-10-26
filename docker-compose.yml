@@ -1,0 +1,29 @@
+version: "3.8"
+
+services:
+  db:
+    build: ./db  # Путь к Dockerfile для базы данных PostgreSQL
+    ports:
+      - "1450:5432"  # Пробросим локальный порт 1450 на порт 5432 контейнера
+    environment:
+      POSTGRES_DB: mydatabase
+      POSTGRES_USER: myuser
+      POSTGRES_PASSWORD: mypassword
+    volumes:
+      - pgdata:/var/lib/postgresql/data  # Для хранения данных
+
+  app:
+    build: .  # Путь к Dockerfile для Go-приложения
+    ports:
+      - "8080:8080"  # Пробросим локальный порт 8080 на порт 8080 контейнера
+    environment:
+      DB_USER: myuser
+      DB_PASSWORD: mypassword
+      DB_NAME: mydatabase
+      DB_HOST: db
+      DB_PORT: 5432
+    depends_on:
+      - db  # Запускаем контейнер приложения после запуска контейнера db
+
+volumes:
+  pgdata:
