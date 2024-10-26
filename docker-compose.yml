@@ -13,7 +13,9 @@ services:
       - pgdata:/var/lib/postgresql/data  # Для хранения данных
 
   app:
-    build: .  # Путь к Dockerfile для Go-приложения
+    build:   # Путь к Dockerfile для Go-приложения
+      context: ./app
+      dockerfile: Dockerfile
     ports:
       - "8080:8080"  # Пробросим локальный порт 8080 на порт 8080 контейнера
     environment:

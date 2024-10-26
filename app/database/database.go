@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"log"
 
-	"github.com/IvanAbramovichWork/family-inventory-app/config"
+	"github.com/IvanAbramovichWork/family-inventory-app/app/config"
 
 	"github.com/jmoiron/sqlx"
 	_ "github.com/lib/pq" // PostgreSQL driver
