@@ -33,15 +33,7 @@
     cd family-inventory-app
     ```
 
-2. **Подготовьте `.env` файл**: Создайте файл `.env` в корневой директории и укажите параметры подключения к базе данных. Пример содержимого:
 
-    ```env
-    DB_USER=myuser
-    DB_PASSWORD=mypassword
-    DB_NAME=mydatabase
-    DB_HOST=db
-    DB_PORT=5432
-    ```
 
 ## Конфигурация
 
