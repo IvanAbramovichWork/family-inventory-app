@@ -3,7 +3,7 @@ package main
 import (
 	"github.com/IvanAbramovichWork/family-inventory-app/app/config"
 	"github.com/IvanAbramovichWork/family-inventory-app/app/database"
-
+	"github.com/IvanAbramovichWork/family-inventory-app/app/handlers"
 	"github.com/gin-gonic/gin"
 )
 
@@ -12,18 +12,13 @@ func main() {
 	cfg := config.NewConfig()
 
 	// Инициализация базы данных
-	database.InitDB(cfg)
+	db := database.InitDB(cfg)
 
-	// Создаем Gin роутер
-	router := gin.Default()
+	r := gin.Default()
+	userHandler := handlers.NewUserHandler(db)
 
-	// Простой эндпоинт для проверки работы сервера
-	router.GET("/ping", func(c *gin.Context) {
-		c.JSON(200, gin.H{
-			"message": "pong",
-		})
-	})
+	r.POST("/users/signup", userHandler.RegisterUser)
+	r.GET("/users/:id", userHandler.GetUser)
 
-	// Запуск сервера
-	router.Run(":8080") // Порт можно настроить
+	r.Run(":8080")
 }

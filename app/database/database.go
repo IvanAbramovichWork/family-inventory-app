@@ -26,7 +26,7 @@ func InitDB(cfg *config.Config) *sqlx.DB {
 	return db
 }
 
-func createFamily(db *sqlx.DB, family *models.Family) error {
+func CreateFamily(db *sqlx.DB, family *models.Family) error {
 	_, err := db.NamedExec(`INSERT INTO family (name, created_at, updated_at) VALUES (:name, :created_at, :updated_at)`, map[string]interface{}{
 		"name":       family.Name,
 		"created_at": family.CreatedAt,
@@ -41,7 +41,7 @@ func createFamily(db *sqlx.DB, family *models.Family) error {
 	return nil
 }
 
-func createFamilyMember(db *sqlx.DB, familyMember *models.FamilyMember) error {
+func CreateFamilyMember(db *sqlx.DB, familyMember *models.FamilyMember) error {
 	_, err := db.NamedExec(`INSERT INTO family_members (family_id, user_id, role) VALUES (:family_id, :user_id, :role)`, map[string]interface{}{
 		"family_id": familyMember.FamilyId,
 		"user_id":   familyMember.UserId,
@@ -56,7 +56,7 @@ func createFamilyMember(db *sqlx.DB, familyMember *models.FamilyMember) error {
 	return nil
 }
 
-func insertInventory(db *sqlx.DB, inventory *models.Inventory) error {
+func InsertInventory(db *sqlx.DB, inventory *models.Inventory) error {
 	_, err := db.NamedExec(`INSERT INTO inventory (family_id, product_id, quantity, expiration_date, created_at, updated_at) VALUES (:family_id, :product_id, :quantity, :expiration_date, :created_at, :updated_at)`, map[string]interface{}{
 		"family_id":       inventory.FamilyId,
 		"product_id":      inventory.ProductId,
@@ -75,7 +75,7 @@ func insertInventory(db *sqlx.DB, inventory *models.Inventory) error {
 	return nil
 }
 
-func createProduct(db *sqlx.DB, product *models.Product) error {
+func CreateProduct(db *sqlx.DB, product *models.Product) error {
 	_, err := db.NamedExec(`INSERT INTO products (name, category, description, photo_url, barcode, created_at, updated_at) VALUES (:name, :category, :description, :photo_url, :barcode, :created_at, :updated_at)`, map[string]interface{}{
 		"name":        product.Name,
 		"category":    product.Category,
@@ -95,8 +95,12 @@ func createProduct(db *sqlx.DB, product *models.Product) error {
 	return nil
 }
 
-func createUser(db *sqlx.DB, user models.User) error {
+func CreateUser(db *sqlx.DB, user models.User) error {
 	query := `INSERT INTO users (name, email, password_hash, role) VALUES (:name, :email, :password, :role)`
+
+	if IsUserExist(db, user.Email) {
+		return fmt.Errorf("user with email %s already exist", user.Email)
+	}
 	_, err := db.NamedExec(query, user)
 
 	if err != nil {
@@ -107,9 +111,25 @@ func createUser(db *sqlx.DB, user models.User) error {
 	return nil
 }
 
-func getUserByID(db *sqlx.DB, userID int) (*models.User, error) {
+// GetUserByID получает пользователя по его ID
+func GetUserByID(db *sqlx.DB, userID string) (*models.User, error) {
 	var user models.User
 	query := `SELECT * FROM users WHERE id = $1`
 	err := db.Get(&user, query, userID)
-	return &user, err
+	if err != nil {
+		log.Printf("Error getting user by id: %v", err)
+		return nil, err
+	}
+	return &user, nil
+}
+
+func IsUserExist(db *sqlx.DB, email string) bool {
+	var user models.User
+	query := `SELECT * FROM users WHERE email = $1`
+	err := db.Get(&user, query, email)
+	if err != nil {
+		log.Printf("Error getting user by email: %v", err)
+		return false
+	}
+	return true
 }
