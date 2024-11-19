@@ -69,3 +69,12 @@ func (s *FamilyService) UpdateFamily(familyId string, family *models.Family) err
 
 	return nil
 }
+
+func (s *FamilyService) DeleteFamily(familyId string) error {
+	query := "DELETE FROM families WHERE id = $1"
+	_, err := s.db.Exec(query, familyId)
+	if err != nil {
+		return errors.New("failed to delete family")
+	}
+	return nil
+}
