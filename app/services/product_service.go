@@ -37,3 +37,15 @@ func (s *ProductService) GetProductByID(id string) (*models.Product, error) {
 	}
 	return &product, nil
 }
+
+func (s *ProductService) UpdateProduct(product *models.Product) error {
+	query := `UPDATE products SET name = $1, category = $2, description = $3 WHERE id = $4`
+	_, err := s.db.Exec(query, product.Name, product.Category, product.Description, product.Id)
+	return err
+}
+
+func (s *ProductService) DeleteProduct(id string) error {
+	query := `DELETE FROM products WHERE id = $1`
+	_, err := s.db.Exec(query, id)
+	return err
+}
